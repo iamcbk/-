@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.system.mapper.goodsMapper">
+    
+    <resultMap type="goods" id="goodsResult">
+        <result property="goodsId"    column="goods_id"    />
+        <result property="photo"    column="photo"    />
+        <result property="mainTitle"    column="main_title"    />
+        <result property="secondaryTitle"    column="secondary_title"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="description"    column="description"    />
+        <result property="soldNumber"    column="sold_number"    />
+        <result property="price"    column="price"    />
+        <result property="points"    column="points"    />
+        <result property="remark"    column="remark"    />
+        <result property="originPlace"    column="origin_place"    />
+        <result property="specification"    column="specification"    />
+        <result property="shelfLife"    column="shelf_life"    />
+        <result property="deliver"    column="deliver"    />
+        <result property="advertisement"    column="advertisement"    />
+        <result property="goodsStatus"    column="goods_status"    />
+    </resultMap>
+
+    <resultMap id="goodsCategoryResult" type="goods" extends="goodsResult">
+        <collection property="categoryList" ofType="Category" column="goods_id" select="selectCategoryList" />
+    </resultMap>
+
+    <resultMap type="Category" id="CategoryResult">
+        <result property="categoryId"    column="category_id"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categoryStatus"    column="category_status"    />
+    </resultMap>
+
+    <sql id="selectgoodsVo">
+        select goods_id, photo, main_title, secondary_title, category_id, description, sold_number, price, points, remark, origin_place, specification, shelf_life, deliver, advertisement, goods_status from goods
+    </sql>
+
+    <select id="selectgoodsList" parameterType="goods" resultMap="goodsResult">
+        <include refid="selectgoodsVo"/>
+        <where>  
+            <if test="mainTitle != null  and mainTitle != ''"> and main_title like concat('%', #{mainTitle}, '%')</if>
+            <if test="goodsStatus != null  and goodsStatus != ''"> and goods_status = #{goodsStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectgoodsByGoodsId" parameterType="Long" resultMap="goodsCategoryResult">
+        select goods_id, photo, main_title, secondary_title, category_id, description, sold_number, price, points, remark, origin_place, specification, shelf_life, deliver, advertisement, goods_status
+        from goods
+        where goods_id = #{goodsId}
+    </select>
+
+    <select id="selectCategoryList" resultMap="CategoryResult">
+        select category_id, category_name, category_status
+        from category
+        where category_id = #{category_id}
+    </select>
+
+    <insert id="insertgoods" parameterType="goods" useGeneratedKeys="true" keyProperty="goodsId">
+        insert into goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="photo != null">photo,</if>
+            <if test="mainTitle != null">main_title,</if>
+            <if test="secondaryTitle != null">secondary_title,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="description != null">description,</if>
+            <if test="soldNumber != null">sold_number,</if>
+            <if test="price != null">price,</if>
+            <if test="points != null">points,</if>
+            <if test="remark != null">remark,</if>
+            <if test="originPlace != null">origin_place,</if>
+            <if test="specification != null">specification,</if>
+            <if test="shelfLife != null">shelf_life,</if>
+            <if test="deliver != null">deliver,</if>
+            <if test="advertisement != null">advertisement,</if>
+            <if test="goodsStatus != null">goods_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="photo != null">#{photo},</if>
+            <if test="mainTitle != null">#{mainTitle},</if>
+            <if test="secondaryTitle != null">#{secondaryTitle},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="description != null">#{description},</if>
+            <if test="soldNumber != null">#{soldNumber},</if>
+            <if test="price != null">#{price},</if>
+            <if test="points != null">#{points},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="originPlace != null">#{originPlace},</if>
+            <if test="specification != null">#{specification},</if>
+            <if test="shelfLife != null">#{shelfLife},</if>
+            <if test="deliver != null">#{deliver},</if>
+            <if test="advertisement != null">#{advertisement},</if>
+            <if test="goodsStatus != null">#{goodsStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updategoods" parameterType="goods">
+        update goods
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="photo != null">photo = #{photo},</if>
+            <if test="mainTitle != null">main_title = #{mainTitle},</if>
+            <if test="secondaryTitle != null">secondary_title = #{secondaryTitle},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="soldNumber != null">sold_number = #{soldNumber},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="points != null">points = #{points},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="originPlace != null">origin_place = #{originPlace},</if>
+            <if test="specification != null">specification = #{specification},</if>
+            <if test="shelfLife != null">shelf_life = #{shelfLife},</if>
+            <if test="deliver != null">deliver = #{deliver},</if>
+            <if test="advertisement != null">advertisement = #{advertisement},</if>
+            <if test="goodsStatus != null">goods_status = #{goodsStatus},</if>
+        </trim>
+        where goods_id = #{goodsId}
+    </update>
+
+    <delete id="deletegoodsByGoodsId" parameterType="Long">
+        delete from goods where goods_id = #{goodsId}
+    </delete>
+
+    <delete id="deletegoodsByGoodsIds" parameterType="String">
+        delete from goods where goods_id in 
+        <foreach item="goodsId" collection="array" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteCategoryByCategoryIds" parameterType="String">
+        delete from category where category_id in 
+        <foreach item="categoryId" collection="array" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCategoryByCategoryId" parameterType="Long">
+        delete from category where category_id = #{categoryId}
+    </delete>
+
+    <insert id="batchCategory">
+        insert into category( category_id, category_name, category_status) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.categoryId}, #{item.categoryName}, #{item.categoryStatus})
+        </foreach>
+    </insert>
+</mapper>

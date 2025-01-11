@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.system.mapper.EmployeeMapper">
+    
+    <resultMap type="Employee" id="EmployeeResult">
+        <result property="employeeId"    column="employee_id"    />
+        <result property="employeeName"    column="employee_name"    />
+        <result property="employeeAvatar"    column="employee_avatar"    />
+        <result property="star"    column="star"    />
+        <result property="salary"    column="salary"    />
+    </resultMap>
+
+    <sql id="selectEmployeeVo">
+        select employee_id, employee_name, employee_avatar, star, salary from employee
+    </sql>
+
+    <select id="selectEmployeeList" parameterType="Employee" resultMap="EmployeeResult">
+        <include refid="selectEmployeeVo"/>
+        <where>  
+            <if test="employeeName != null  and employeeName != ''"> and employee_name like concat('%', #{employeeName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectEmployeeByEmployeeId" parameterType="Long" resultMap="EmployeeResult">
+        <include refid="selectEmployeeVo"/>
+        where employee_id = #{employeeId}
+    </select>
+
+    <insert id="insertEmployee" parameterType="Employee" useGeneratedKeys="true" keyProperty="employeeId">
+        insert into employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="employeeName != null and employeeName != ''">employee_name,</if>
+            <if test="employeeAvatar != null">employee_avatar,</if>
+            <if test="star != null">star,</if>
+            <if test="salary != null">salary,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="employeeName != null and employeeName != ''">#{employeeName},</if>
+            <if test="employeeAvatar != null">#{employeeAvatar},</if>
+            <if test="star != null">#{star},</if>
+            <if test="salary != null">#{salary},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEmployee" parameterType="Employee">
+        update employee
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="employeeName != null and employeeName != ''">employee_name = #{employeeName},</if>
+            <if test="employeeAvatar != null">employee_avatar = #{employeeAvatar},</if>
+            <if test="star != null">star = #{star},</if>
+            <if test="salary != null">salary = #{salary},</if>
+        </trim>
+        where employee_id = #{employeeId}
+    </update>
+
+    <delete id="deleteEmployeeByEmployeeId" parameterType="Long">
+        delete from employee where employee_id = #{employeeId}
+    </delete>
+
+    <delete id="deleteEmployeeByEmployeeIds" parameterType="String">
+        delete from employee where employee_id in 
+        <foreach item="employeeId" collection="array" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+    </delete>
+</mapper>

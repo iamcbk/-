@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.system.mapper.PointsGoodsMapper">
+    
+    <resultMap type="PointsGoods" id="PointsGoodsResult">
+        <result property="pointsGoodId"    column="points_good_id"    />
+        <result property="photo"    column="photo"    />
+        <result property="title"    column="title"    />
+        <result property="pointsCategoryId"    column="points_category_id"    />
+        <result property="pointsDescription"    column="points_description"    />
+        <result property="soldNumber"    column="sold_number"    />
+        <result property="points"    column="points"    />
+    </resultMap>
+
+    <sql id="selectPointsGoodsVo">
+        select points_good_id, photo, title, points_category_id, points_description, sold_number, points from points_goods
+    </sql>
+
+    <select id="selectPointsGoodsList" parameterType="PointsGoods" resultMap="PointsGoodsResult">
+        <include refid="selectPointsGoodsVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="pointsCategoryId != null "> and points_category_id = #{pointsCategoryId}</if>
+            <if test="pointsDescription != null  and pointsDescription != ''"> and points_description = #{pointsDescription}</if>
+        </where>
+    </select>
+    
+    <select id="selectPointsGoodsByPointsGoodId" parameterType="Long" resultMap="PointsGoodsResult">
+        <include refid="selectPointsGoodsVo"/>
+        where points_good_id = #{pointsGoodId}
+    </select>
+
+    <insert id="insertPointsGoods" parameterType="PointsGoods" useGeneratedKeys="true" keyProperty="pointsGoodId">
+        insert into points_goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="photo != null">photo,</if>
+            <if test="title != null">title,</if>
+            <if test="pointsCategoryId != null">points_category_id,</if>
+            <if test="pointsDescription != null">points_description,</if>
+            <if test="soldNumber != null">sold_number,</if>
+            <if test="points != null">points,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="photo != null">#{photo},</if>
+            <if test="title != null">#{title},</if>
+            <if test="pointsCategoryId != null">#{pointsCategoryId},</if>
+            <if test="pointsDescription != null">#{pointsDescription},</if>
+            <if test="soldNumber != null">#{soldNumber},</if>
+            <if test="points != null">#{points},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePointsGoods" parameterType="PointsGoods">
+        update points_goods
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="photo != null">photo = #{photo},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="pointsCategoryId != null">points_category_id = #{pointsCategoryId},</if>
+            <if test="pointsDescription != null">points_description = #{pointsDescription},</if>
+            <if test="soldNumber != null">sold_number = #{soldNumber},</if>
+            <if test="points != null">points = #{points},</if>
+        </trim>
+        where points_good_id = #{pointsGoodId}
+    </update>
+
+    <delete id="deletePointsGoodsByPointsGoodId" parameterType="Long">
+        delete from points_goods where points_good_id = #{pointsGoodId}
+    </delete>
+
+    <delete id="deletePointsGoodsByPointsGoodIds" parameterType="String">
+        delete from points_goods where points_good_id in 
+        <foreach item="pointsGoodId" collection="array" open="(" separator="," close=")">
+            #{pointsGoodId}
+        </foreach>
+    </delete>
+
+</mapper>

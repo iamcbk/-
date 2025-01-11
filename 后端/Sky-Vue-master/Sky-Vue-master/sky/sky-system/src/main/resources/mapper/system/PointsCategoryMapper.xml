@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.system.mapper.PointsCategoryMapper">
+    
+    <resultMap type="PointsCategory" id="PointsCategoryResult">
+        <result property="pointsCategoryId"    column="points_category_id"    />
+        <result property="pointsCategoryName"    column="points_category_name"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectPointsCategoryVo">
+        select points_category_id, points_category_name, status from points_category
+    </sql>
+
+    <select id="selectPointsCategoryList" parameterType="PointsCategory" resultMap="PointsCategoryResult">
+        <include refid="selectPointsCategoryVo"/>
+        <where>  
+            <if test="pointsCategoryName != null  and pointsCategoryName != ''"> and points_category_name like concat('%', #{pointsCategoryName}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectPointsCategoryByPointsCategoryId" parameterType="Long" resultMap="PointsCategoryResult">
+        <include refid="selectPointsCategoryVo"/>
+        where points_category_id = #{pointsCategoryId}
+    </select>
+
+    <insert id="insertPointsCategory" parameterType="PointsCategory" useGeneratedKeys="true" keyProperty="pointsCategoryId">
+        insert into points_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pointsCategoryName != null and pointsCategoryName != ''">points_category_name,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pointsCategoryName != null and pointsCategoryName != ''">#{pointsCategoryName},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePointsCategory" parameterType="PointsCategory">
+        update points_category
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pointsCategoryName != null and pointsCategoryName != ''">points_category_name = #{pointsCategoryName},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where points_category_id = #{pointsCategoryId}
+    </update>
+
+    <delete id="deletePointsCategoryByPointsCategoryId" parameterType="Long">
+        delete from points_category where points_category_id = #{pointsCategoryId}
+    </delete>
+
+    <delete id="deletePointsCategoryByPointsCategoryIds" parameterType="String">
+        delete from points_category where points_category_id in 
+        <foreach item="pointsCategoryId" collection="array" open="(" separator="," close=")">
+            #{pointsCategoryId}
+        </foreach>
+    </delete>
+</mapper>

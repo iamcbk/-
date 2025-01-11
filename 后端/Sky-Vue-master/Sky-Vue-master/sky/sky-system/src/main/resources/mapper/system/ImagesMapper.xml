@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.system.mapper.ImagesMapper">
+    
+    <resultMap type="Images" id="ImagesResult">
+        <result property="otherId"    column="other_id"    />
+        <result property="images"    column="images"    />
+    </resultMap>
+
+    <sql id="selectImagesVo">
+        select other_id, images from images
+    </sql>
+
+    <select id="selectImagesList" parameterType="Images" resultMap="ImagesResult">
+        <include refid="selectImagesVo"/>
+        <where>  
+        </where>
+    </select>
+    
+    <select id="selectImagesByOtherId" parameterType="Long" resultMap="ImagesResult">
+        <include refid="selectImagesVo"/>
+        where other_id = #{otherId}
+    </select>
+
+    <insert id="insertImages" parameterType="Images" useGeneratedKeys="true" keyProperty="otherId">
+        insert into images
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="images != null">images,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="images != null">#{images},</if>
+         </trim>
+    </insert>
+
+    <update id="updateImages" parameterType="Images">
+        update images
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="images != null">images = #{images},</if>
+        </trim>
+        where other_id = #{otherId}
+    </update>
+
+    <delete id="deleteImagesByOtherId" parameterType="Long">
+        delete from images where other_id = #{otherId}
+    </delete>
+
+    <delete id="deleteImagesByOtherIds" parameterType="String">
+        delete from images where other_id in 
+        <foreach item="otherId" collection="array" open="(" separator="," close=")">
+            #{otherId}
+        </foreach>
+    </delete>
+</mapper>

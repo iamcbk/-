@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.system.mapper.EmailMapper">
+    
+    <resultMap type="Email" id="EmailResult">
+        <result property="emailId"    column="email_id"    />
+        <result property="senderName"    column="sender_name"    />
+        <result property="phone"    column="phone"    />
+        <result property="email"    column="email"    />
+        <result property="content"    column="content"    />
+        <result property="sentTime"    column="sent_time"    />
+        <result property="readStatus"    column="read_status"    />
+    </resultMap>
+
+    <sql id="selectEmailVo">
+        select email_id, sender_name, phone, email, content, sent_time, read_status from email
+    </sql>
+
+    <select id="selectEmailList" parameterType="Email" resultMap="EmailResult">
+        <include refid="selectEmailVo"/>
+        <where>  
+            <if test="senderName != null  and senderName != ''"> and sender_name like concat('%', #{senderName}, '%')</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="readStatus != null  and readStatus != ''"> and read_status = #{readStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectEmailByEmailId" parameterType="Long" resultMap="EmailResult">
+        <include refid="selectEmailVo"/>
+        where email_id = #{emailId}
+    </select>
+
+    <insert id="insertEmail" parameterType="Email" useGeneratedKeys="true" keyProperty="emailId">
+        insert into email
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="senderName != null and senderName != ''">sender_name,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="email != null">email,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="sentTime != null">sent_time,</if>
+            <if test="readStatus != null">read_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="senderName != null and senderName != ''">#{senderName},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="email != null">#{email},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="sentTime != null">#{sentTime},</if>
+            <if test="readStatus != null">#{readStatus},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEmail" parameterType="Email">
+        update email
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="senderName != null and senderName != ''">sender_name = #{senderName},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="sentTime != null">sent_time = #{sentTime},</if>
+            <if test="readStatus != null">read_status = #{readStatus},</if>
+        </trim>
+        where email_id = #{emailId}
+    </update>
+
+    <delete id="deleteEmailByEmailId" parameterType="Long">
+        delete from email where email_id = #{emailId}
+    </delete>
+
+    <delete id="deleteEmailByEmailIds" parameterType="String">
+        delete from email where email_id in 
+        <foreach item="emailId" collection="array" open="(" separator="," close=")">
+            #{emailId}
+        </foreach>
+    </delete>
+</mapper>
